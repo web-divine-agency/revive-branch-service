@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: "03-BranchService",
+      name: "ReviveBranchService",
       namespace: "revive-branch-service",
       script: "./src/index.js",
       watch: ["./src", "./src/*.js"],
