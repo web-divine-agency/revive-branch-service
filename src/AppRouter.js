@@ -24,15 +24,18 @@ const admin = express.Router();
 app.use("/portal", portal);
 portal.use(authenticated);
 
+portal.get("/branches/all", BranchController.all);
+
+portal.get("/branches", BranchController.list);
+
+
 /**
  * Admin routes
  */
 app.use("/admin", admin);
 admin.use(authAdmin);
-admin.get("/branches", BranchController.list);
 admin.post("/branches", BranchController.create);
 
-admin.get("/fn/branches-all", BranchController.all);
 
 /**
  * Base routes

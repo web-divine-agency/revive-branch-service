@@ -1,11 +1,11 @@
 import Logger from "../util/logger.js";
 import Validator from "../util/validator.js";
 
-import MysqlService from "../services/MysqlService.js";
+import DatabaseService from "../services/DatabaseService.js";
 
 export default {
   /**
-   * List all branches without pagination
+   * List branches without pagination
    * @param {*} req
    * @param {*} res
    */
@@ -24,7 +24,7 @@ export default {
   },
 
   /**
-   * List of branches
+   * List branches
    * @param {*} req
    * @param {*} res
    * @returns
@@ -88,7 +88,9 @@ export default {
    * @returns
    */
   create: (req, res) => {
-    let validation = Validator.check([
+    let message, validation;
+
+    validation = Validator.check([
       Validator.required(req.body, "name"),
       Validator.required(req.body, "zip_code"),
       Validator.required(req.body, "city"),
@@ -98,14 +100,14 @@ export default {
     ]);
 
     if (!validation.pass) {
-      let message = Logger.message(req, res, 422, "error", validation.result);
+      message = Logger.message(req, res, 422, "error", validation.result);
       Logger.error([JSON.stringify(message)]);
       return res.json(message);
     }
 
-    MysqlService.create("branches", req.body)
+    DatabaseService.create({ table: "branches", data: req.body })
       .then((response) => {
-        let message = Logger.message(req, res, 200, "branch", response.insertId);
+        let message = Logger.message(req, res, 200, "branch", response.data.result.insertId);
         Logger.out([JSON.stringify(message)]);
         return res.json(message);
       })
