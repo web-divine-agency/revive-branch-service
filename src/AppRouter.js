@@ -9,9 +9,7 @@ import { authAdmin, authenticated } from "./middleware/auth.js";
 import Controller from "./controllers/Controller.js";
 import BranchController from "./controllers/BranchController.js";
 
-if (process.env.APP_ENV === "dev") {
-  app.use(cors());
-}
+app.use(cors());
 
 app.use(bodyParser.json());
 
@@ -35,7 +33,6 @@ portal.get("/branches/:branch_id", BranchController.read);
 app.use("/admin", admin);
 admin.use(authAdmin);
 admin.post("/branches", BranchController.create);
-
 
 /**
  * Base routes
