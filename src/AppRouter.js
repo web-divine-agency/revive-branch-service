@@ -27,7 +27,7 @@ portal.use(authenticated);
 portal.get("/branches/all", BranchController.all);
 
 portal.get("/branches", BranchController.list);
-
+portal.get("/branches/:branch_id", BranchController.read);
 
 /**
  * Admin routes

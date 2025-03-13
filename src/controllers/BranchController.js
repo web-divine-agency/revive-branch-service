@@ -10,14 +10,16 @@ export default {
    * @param {*} res
    */
   all: (req, res) => {
-    MysqlService.select(`SELECT * FROM branches WHERE deleted_at IS NULL`)
+    let message;
+
+    DatabaseService.select({ query: `SELECT * FROM branches WHERE deleted_at IS NULL` })
       .then((response) => {
-        let message = Logger.message(req, res, 200, "branches", response);
+        message = Logger.message(req, res, 200, "branches", response.data.result);
         Logger.out([JSON.stringify(message)]);
         return res.json(message);
       })
       .catch((error) => {
-        let message = Logger.message(req, res, 500, "error", error);
+        message = Logger.message(req, res, 500, "error", error);
         Logger.error([JSON.stringify(message)]);
         return res.json(message);
       });
@@ -30,24 +32,27 @@ export default {
    * @returns
    */
   list: (req, res) => {
-    let validation = Validator.check([
+    let message, validation, name, find, direction, query;
+
+    validation = Validator.check([
       Validator.required(req.query, "direction"),
       Validator.required(req.query, "last"),
       Validator.required(req.query, "show"),
     ]);
 
     if (!validation.pass) {
-      let message = Logger.message(req, res, 422, "error", validation.result);
+      message = Logger.message(req, res, 422, "error", validation.result);
       Logger.error([JSON.stringify(message)]);
       return res.json(message);
     }
 
     const { last, show } = req.query;
-    let name = req.query.name || "";
-    let find = req.query.find || "";
-    let direction = req.query.direction === "next" ? "<" : ">";
 
-    let query = `
+    name = req.query.name || "";
+    find = req.query.find || "";
+    direction = req.query.direction === "next" ? "<" : ">";
+
+    query = `
       SELECT
         *
       FROM branches
@@ -68,9 +73,9 @@ export default {
       LIMIT ${show}
     `;
 
-    MysqlService.select(query)
+    DatabaseService.select({ query })
       .then((response) => {
-        let message = Logger.message(req, res, 200, "branches", response);
+        let message = Logger.message(req, res, 200, "branches", response.data.result);
         Logger.out([JSON.stringify(message)]);
         return res.json(message);
       })
@@ -108,6 +113,46 @@ export default {
     DatabaseService.create({ table: "branches", data: req.body })
       .then((response) => {
         let message = Logger.message(req, res, 200, "branch", response.data.result.insertId);
+        Logger.out([JSON.stringify(message)]);
+        return res.json(message);
+      })
+      .catch((error) => {
+        let message = Logger.message(req, res, 500, "error", error);
+        Logger.error([JSON.stringify(message)]);
+        return res.json(message);
+      });
+  },
+
+  /**
+   * Read branch
+   * @param {*} req 
+   * @param {*} res 
+   * @returns 
+   */
+  read: (req, res) => {
+    let message, validation, query;
+
+    validation = Validator.check([Validator.required(req.params, "branch_id")]);
+
+    if (!validation.pass) {
+      message = Logger.message(req, res, 422, "error", validation.result);
+      Logger.error([JSON.stringify(message)]);
+      return res.json(message);
+    }
+
+    const { branch_id } = req.params;
+
+    query = `
+      SELECT
+        *
+      FROM branches
+      WHERE deleted_at IS NULL
+      AND id = ${branch_id} 
+    `;
+
+    DatabaseService.select({ query })
+      .then((response) => {
+        let message = Logger.message(req, res, 200, "branch", response.data.result[0]);
         Logger.out([JSON.stringify(message)]);
         return res.json(message);
       })
