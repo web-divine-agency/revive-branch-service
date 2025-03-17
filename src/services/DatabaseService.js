@@ -50,7 +50,7 @@ export default {
   },
 
   /**
-   * Update branch
+   * Update resource
    * @param {*} payload
    * @returns
    */
@@ -71,6 +71,33 @@ export default {
     }
   },
 
+  /**
+   * Delete resource
+   * @param {*} payload
+   * @returns
+   */
+  delete: async (payload) => {
+    try {
+      return await axios({
+        method: "DELETE",
+        baseURL: url.databaseService,
+        url: `/db/delete`,
+        data: payload,
+        headers: {
+          Authorization: token,
+        },
+      });
+    } catch (error) {
+      const { status, data } = error?.response;
+      return Promise.reject({ status: status, database: data });
+    }
+  },
+
+  /**
+   * Get user
+   * @param {*} payload
+   * @returns
+   */
   user: async (payload) => {
     try {
       return await axios({

@@ -202,4 +202,35 @@ export default {
         return res.json(message);
       });
   },
+
+  delete: (req, res) => {
+    let message, validation;
+
+    validation = Validator.check([Validator.required(req.params, "branch_id")]);
+
+    if (!validation.pass) {
+      message = Logger.message(req, res, 422, "error", validation.result);
+      Logger.error([JSON.stringify(message)]);
+      return res.json(message);
+    }
+
+    const { branch_id } = req.params;
+
+    DatabaseService.delete({
+      table: "branches",
+      params: {
+        id: branch_id,
+      },
+    })
+      .then(() => {
+        message = Logger.message(req, res, 200, "deleted", true);
+        Logger.out([JSON.stringify(message)]);
+        return res.json(message);
+      })
+      .catch((error) => {
+        message = Logger.message(req, res, 500, "error", error.stack);
+        Logger.error([JSON.stringify(message)]);
+        return res.json(message);
+      });
+  },
 };

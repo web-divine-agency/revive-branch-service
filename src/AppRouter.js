@@ -34,6 +34,7 @@ app.use("/admin", admin);
 admin.use(authAdmin);
 admin.post("/branches", BranchController.create);
 admin.put("/branches/:branch_id", BranchController.update);
+admin.delete("/branches/:branch_id", BranchController.delete);
 
 /**
  * Base routes
