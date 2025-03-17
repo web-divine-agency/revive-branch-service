@@ -33,6 +33,7 @@ portal.get("/branches/:branch_id", BranchController.read);
 app.use("/admin", admin);
 admin.use(authAdmin);
 admin.post("/branches", BranchController.create);
+admin.put("/branches/:branch_id", BranchController.update);
 
 /**
  * Base routes

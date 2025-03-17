@@ -125,9 +125,9 @@ export default {
 
   /**
    * Read branch
-   * @param {*} req 
-   * @param {*} res 
-   * @returns 
+   * @param {*} req
+   * @param {*} res
+   * @returns
    */
   read: (req, res) => {
     let message, validation, query;
@@ -158,6 +158,46 @@ export default {
       })
       .catch((error) => {
         let message = Logger.message(req, res, 500, "error", error);
+        Logger.error([JSON.stringify(message)]);
+        return res.json(message);
+      });
+  },
+
+  /**
+   * Update branch
+   * @param {*} req
+   * @param {*} res
+   * @returns
+   */
+  update: (req, res) => {
+    let message, validation;
+
+    validation = Validator.check([
+      Validator.required(req.params, "branch_id"),
+      Validator.required(req.body, "name"),
+      Validator.required(req.body, "zip_code"),
+      Validator.required(req.body, "city"),
+      Validator.required(req.body, "state"),
+      Validator.required(req.body, "opening"),
+      Validator.required(req.body, "closing"),
+    ]);
+
+    if (!validation.pass) {
+      message = Logger.message(req, res, 422, "error", validation.result);
+      Logger.error([JSON.stringify(message)]);
+      return res.json(message);
+    }
+
+    const { branch_id } = req.params;
+
+    DatabaseService.update({ table: "branches", data: req.body, params: { id: branch_id } })
+      .then(() => {
+        message = Logger.message(req, res, 200, "updated", true);
+        Logger.error([JSON.stringify(message)]);
+        return res.json(message);
+      })
+      .catch((error) => {
+        message = Logger.message(req, res, 500, "error", error.stack);
         Logger.error([JSON.stringify(message)]);
         return res.json(message);
       });
